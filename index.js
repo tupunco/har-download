@@ -53,11 +53,13 @@ function download(task, callback) {
         let headers = {};
         for (let i in task.raw.request.headers) {
             let headObj = task.raw.request.headers[i];
-            headers[headObj.name] = headObj.value;
+            if (headObj.name == 'User-Agent' || headObj.name == 'Referer')
+                headers[headObj.name] = headObj.value;
         }
         let options = {
             url: task.url,
-            method: task.raw.request.method
+            method: task.raw.request.method,
+            headers: headers,
         };
         let req = request(options)
             .on('error', function(err) {
@@ -129,6 +131,7 @@ let index = module.exports = {
             console.log("har-download  demo.HAR  export/folder");
             return;
         }
+
         let har = fs.readFileSync(args[0], 'utf-8');
         this.fromText(har, args[1], 10000, function(err) {
             if (err.length) {
